@@ -1,7 +1,15 @@
+//
+//  ClipyApp.swift
+//  Clipy
+//
+//  Created by Ayman Omara on 07/08/2026.
+//
+
 import SwiftUI
 
 @main
 struct ClipyApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var historyManager: ClipboardHistoryManager
     
     init() {

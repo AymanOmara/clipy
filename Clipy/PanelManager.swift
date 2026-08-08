@@ -56,6 +56,7 @@ final class PanelManager: NSObject {
             self.createPanelWindow()
             self.createEdgeTriggerWindow()
             self.setupMonitors()
+            self.setupScreenChangeObserver()
             self.hotkeyManager.register { [weak self] in self?.togglePanel() }
         }
     }
@@ -120,6 +121,24 @@ final class PanelManager: NSObject {
         
         self.triggerWindow = trigger
         trigger.orderFrontRegardless()
+    }
+    
+    private func setupScreenChangeObserver() {
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self, let trigger = self.triggerWindow, let screen = NSScreen.main else { return }
+            let frame = screen.frame
+            trigger.setFrame(NSRect(
+                x: frame.minX + (frame.width - 160) / 2,
+                y: frame.minY + 2,
+                width: 160,
+                height: 14
+            ), display: true)
+            trigger.orderFrontRegardless()
+        }
     }
     
     private func setupMonitors() {
