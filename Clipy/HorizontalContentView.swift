@@ -78,7 +78,6 @@ struct HorizontalContentView: View {
                             }
                             .onHover { hovering in
                                 hoveredItemId = hovering ? item.id : nil
-                                if hovering { selectedIndex = index }
                             }
                         }
                     }
