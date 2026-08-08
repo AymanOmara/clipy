@@ -1,0 +1,46 @@
+# Xcode
+## User settings & project cache
+*.xcuserstate
+project.xcworkspace/xcuserdata/
+*.xcuserdatad
+xcuserdata/
+
+## Build outputs
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.app
+*.log
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+*.xcodeproj/.swiftpm/xcode/package.resolved
+
+# CocoaPods & Carthage (if used in future)
+Pods/
+Carthage/Build/
+
+# macOS System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*~
