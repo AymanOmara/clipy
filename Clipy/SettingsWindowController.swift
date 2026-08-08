@@ -8,56 +8,58 @@
 import Cocoa
 import SwiftUI
 
-/// Manages the presentation and lifecycle of the Preferences window.
-final class SettingsWindowController {
-    private var window: NSWindow?
+/// Manages the presentation and lifecycle of the Preferences panel.
+final class SettingsWindowController: NSObject, NSWindowDelegate {
+    private var window: NSPanel?
     
     func showSettings(with historyManager: ClipboardHistoryManager) {
         if let existing = window {
-            existing.makeKeyAndOrderFront(nil)
+            existing.orderFrontRegardless()
+            existing.makeKey()
             NSApp.activate()
             return
         }
         
-        let settingsWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 400),
-            styleMask: [.titled, .closable, .fullSizeContentView],
+        let settingsPanel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 420),
+            styleMask: [.titled, .closable, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
-        settingsWindow.title = "Clipy Preferences"
-        settingsWindow.titlebarAppearsTransparent = true
-        settingsWindow.titleVisibility = .visible
-        settingsWindow.center()
+        settingsPanel.title = "Clipy Preferences"
+        settingsPanel.titlebarAppearsTransparent = true
+        settingsPanel.titleVisibility = .visible
+        settingsPanel.isReleasedWhenClosed = false
+        settingsPanel.hidesOnDeactivate = false
+        settingsPanel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        settingsPanel.center()
+        settingsPanel.delegate = self
         
         let settingsView = SettingsView(isPresented: Binding(
-            get: { true },
+            get: { [weak self] in self?.window?.isVisible ?? true },
             set: { [weak self] isPresented in
                 if !isPresented {
-                    self?.window?.close()
-                    self?.window = nil
+                    self?.window?.orderOut(nil)
                 }
             }
         ))
         .environment(historyManager)
         
-        settingsWindow.contentView = NSHostingView(rootView: settingsView)
-        self.window = settingsWindow
+        settingsPanel.contentView = NSHostingView(rootView: settingsView)
+        self.window = settingsPanel
         
-        NotificationCenter.default.addObserver(
-            forName: NSWindow.willCloseNotification,
-            object: settingsWindow,
-            queue: .main
-        ) { [weak self] _ in
-            self?.window = nil
-        }
-        
-        settingsWindow.makeKeyAndOrderFront(nil)
+        settingsPanel.orderFrontRegardless()
+        settingsPanel.makeKey()
         NSApp.activate()
     }
     
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        sender.orderOut(nil)
+        return false // Prevents AppKit window destruction / app termination
+    }
+    
     func isPointInsideSettingsWindow(_ point: NSPoint) -> Bool {
-        guard let window = window else { return false }
+        guard let window = window, window.isVisible else { return false }
         return NSPointInRect(point, window.frame)
     }
 }
