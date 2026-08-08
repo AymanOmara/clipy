@@ -14,6 +14,8 @@ struct HorizontalHeaderBar: View {
     var onOpenSettings: () -> Void
     var onClose: () -> Void
     
+    @State private var isCloseHovered = false
+    
     var body: some View {
         HStack(spacing: 16) {
             brandTitle
@@ -119,12 +121,17 @@ struct HorizontalHeaderBar: View {
         Button(action: onClose) {
             Image(systemName: "xmark")
                 .font(.system(size: 11, weight: .bold))
-                .foregroundColor(.secondary)
+                .foregroundColor(isCloseHovered ? .white : .red)
                 .padding(8)
-                .background(Color.primary.opacity(0.04))
+                .background(isCloseHovered ? Color.red.opacity(0.9) : Color.red.opacity(0.12))
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isCloseHovered = hovering
+            }
+        }
         .help("Close Panel (Esc)")
     }
 }
