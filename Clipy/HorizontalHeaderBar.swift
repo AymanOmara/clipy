@@ -12,7 +12,6 @@ struct HorizontalHeaderBar: View {
     @Binding var selectedFilter: FilterType
     var onResetSelection: () -> Void
     var onOpenSettings: () -> Void
-    var onClose: () -> Void
     
     var body: some View {
         HStack(spacing: 16) {
@@ -20,10 +19,7 @@ struct HorizontalHeaderBar: View {
             searchField
             filterPills
             Spacer()
-            HStack(spacing: 8) {
-                preferencesButton
-                closeButton
-            }
+            preferencesButton
         }
         .padding(.horizontal, 20)
         .padding(.top, 14)
@@ -113,18 +109,5 @@ struct HorizontalHeaderBar: View {
         }
         .buttonStyle(.plain)
         .help("Open Preferences")
-    }
-    
-    private var closeButton: some View {
-        Button(action: onClose) {
-            Image(systemName: "xmark")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(.secondary)
-                .padding(8)
-                .background(Color.primary.opacity(0.04))
-                .clipShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .help("Close Panel (Esc)")
     }
 }

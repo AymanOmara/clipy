@@ -12,7 +12,7 @@ struct SettingsStorageSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Data & Storage")
+            Text("Data & Actions")
                 .font(.caption)
                 .fontWeight(.semibold)
                 .foregroundColor(.secondary)
@@ -65,6 +65,44 @@ struct SettingsStorageSection: View {
                             .background(Color.red.opacity(0.1))
                             .foregroundColor(.red)
                             .cornerRadius(8)
+                    }
+                    .buttonStyle(.plain)
+                }
+                
+                Divider().padding(.vertical, 4)
+                
+                HStack(spacing: 12) {
+                    Button(action: {
+                        AppLifecycleUtility.restartApp()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.clockwise")
+                            Text("Restart App")
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.accentColor.opacity(0.12))
+                        .foregroundColor(.accentColor)
+                        .cornerRadius(8)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: {
+                        NSApp.terminate(nil)
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "power")
+                            Text("Quit Clipy")
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.primary.opacity(0.06))
+                        .foregroundColor(.secondary)
+                        .cornerRadius(8)
                     }
                     .buttonStyle(.plain)
                 }

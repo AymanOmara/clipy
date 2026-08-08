@@ -83,8 +83,7 @@ final class PanelManager: NSObject {
         
         let contentView = HorizontalContentView(
             onCopyAndPaste: { [weak self] item in self?.copyAndPasteItem(item) },
-            onOpenSettings: { [weak self] in self?.openSettings() },
-            onClose: { [weak self] in self?.hidePanel() }
+            onOpenSettings: { [weak self] in self?.openSettings() }
         )
         .environment(historyManager)
         
@@ -131,12 +130,7 @@ final class PanelManager: NSObject {
         ) { [weak self] _ in
             guard let self = self, let trigger = self.triggerWindow, let screen = NSScreen.main else { return }
             let frame = screen.frame
-            trigger.setFrame(NSRect(
-                x: frame.minX + (frame.width - 160) / 2,
-                y: frame.minY + 2,
-                width: 160,
-                height: 14
-            ), display: true)
+            trigger.setFrame(NSRect(x: frame.minX + (frame.width - 160) / 2, y: frame.minY + 2, width: 160, height: 14), display: true)
             trigger.orderFrontRegardless()
         }
     }
@@ -151,11 +145,7 @@ final class PanelManager: NSObject {
     }
     
     func togglePanel() {
-        if isPanelDisplayed {
-            hidePanel()
-        } else {
-            showPanel()
-        }
+        if isPanelDisplayed { hidePanel() } else { showPanel() }
     }
     
     func showPanel() {
@@ -166,12 +156,7 @@ final class PanelManager: NSObject {
         let panelHeight = panel.frame.height
         let panelWidth = panel.frame.width
         
-        panel.setFrame(NSRect(
-            x: screenFrame.minX + (screenFrame.width - panelWidth) / 2,
-            y: screenFrame.minY - panelHeight,
-            width: panelWidth,
-            height: panelHeight
-        ), display: true)
+        panel.setFrame(NSRect(x: screenFrame.minX + (screenFrame.width - panelWidth) / 2, y: screenFrame.minY - panelHeight, width: panelWidth, height: panelHeight), display: true)
         panel.alphaValue = 0.0
         panel.orderFrontRegardless()
         
@@ -182,7 +167,6 @@ final class PanelManager: NSObject {
     
     func hidePanel() {
         guard let panel = panelWindow, panel.isVisible, !animator.isAnimating else { return }
-        
         animator.slideDown(panel: panel) { [weak self] in
             guard let self = self else { return }
             self.panelWindow?.orderOut(nil)
