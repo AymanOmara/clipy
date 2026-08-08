@@ -38,18 +38,9 @@ struct SettingsView: View {
                 .font(.headline)
                 .foregroundColor(.primary)
             Spacer()
-            Button(action: {
-                withAnimation {
-                    isPresented = false
-                }
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-            }
-            .buttonStyle(.plain)
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.vertical, 12)
         .background(Color.primary.opacity(0.03))
     }
     

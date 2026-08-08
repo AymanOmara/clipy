@@ -20,6 +20,7 @@ struct HorizontalContentView: View {
     
     var onCopyAndPaste: (ClipboardHistoryItem) -> Void
     var onOpenSettings: () -> Void
+    var onClose: () -> Void
     
     var body: some View {
         VStack(spacing: 0) {
@@ -27,7 +28,8 @@ struct HorizontalContentView: View {
                 searchText: $searchText,
                 selectedFilter: $selectedFilter,
                 onResetSelection: { selectedIndex = 0 },
-                onOpenSettings: onOpenSettings
+                onOpenSettings: onOpenSettings,
+                onClose: onClose
             )
             
             Divider().opacity(0.5)

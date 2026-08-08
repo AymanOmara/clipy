@@ -83,7 +83,8 @@ final class PanelManager: NSObject {
         
         let contentView = HorizontalContentView(
             onCopyAndPaste: { [weak self] item in self?.copyAndPasteItem(item) },
-            onOpenSettings: { [weak self] in self?.openSettings() }
+            onOpenSettings: { [weak self] in self?.openSettings() },
+            onClose: { [weak self] in self?.hidePanel() }
         )
         .environment(historyManager)
         
