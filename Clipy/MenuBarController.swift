@@ -58,6 +58,11 @@ final class MenuBarController: NSObject, MenuBarControlling {
         
         menu.addItem(NSMenuItem.separator())
         
+        let loginItem = NSMenuItem(title: "Launch at Login", action: #selector(menuLaunchAtLoginAction), keyEquivalent: "")
+        loginItem.target = self
+        loginItem.state = LaunchAtLoginService.isEnabled ? .on : .off
+        menu.addItem(loginItem)
+        
         let restartItem = NSMenuItem(title: "Restart Clipy", action: #selector(menuRestartAction), keyEquivalent: "r")
         restartItem.target = self
         menu.addItem(restartItem)
@@ -73,6 +78,13 @@ final class MenuBarController: NSObject, MenuBarControlling {
     
     @objc private func menuToggleAction() {
         clickHandler?()
+    }
+    
+    @objc private func menuLaunchAtLoginAction() {
+        LaunchAtLoginService.setEnabled(!LaunchAtLoginService.isEnabled)
+        if LaunchAtLoginService.requiresApproval {
+            LaunchAtLoginService.openLoginItemsSettings()
+        }
     }
     
     @objc private func menuRestartAction() {

@@ -6,13 +6,11 @@
 //
 
 import SwiftUI
-#if os(macOS)
-import ServiceManagement
-#endif
 
 struct SettingsGeneralSection: View {
     @Bindable var manager: ClipboardHistoryManager
     @State private var launchAtLoginEnabled = false
+    @State private var launchAtLoginNeedsApproval = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -36,6 +34,20 @@ struct SettingsGeneralSection: View {
                         }
                 }
                 .padding()
+                
+                if launchAtLoginNeedsApproval {
+                    HStack {
+                        Label("Allow Clipy in Login Items to start it automatically", systemImage: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                        Spacer()
+                        Button("Open Settings") {
+                            LaunchAtLoginService.openLoginItemsSettings()
+                        }
+                        .controlSize(.small)
+                    }
+                    .padding([.horizontal, .bottom])
+                }
                 
                 Divider()
                 #endif
@@ -70,25 +82,15 @@ struct SettingsGeneralSection: View {
     
     private func checkLaunchAtLoginStatus() {
         #if os(macOS)
-        launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
+        launchAtLoginEnabled = LaunchAtLoginService.isEnabled || LaunchAtLoginService.requiresApproval
+        launchAtLoginNeedsApproval = LaunchAtLoginService.requiresApproval
         #endif
     }
     
     private func toggleLaunchAtLogin(enabled: Bool) {
         #if os(macOS)
-        do {
-            if enabled {
-                if SMAppService.mainApp.status != .enabled {
-                    try SMAppService.mainApp.register()
-                }
-            } else {
-                if SMAppService.mainApp.status == .enabled {
-                    try SMAppService.mainApp.unregister()
-                }
-            }
-        } catch {
-            print("[SettingsGeneralSection] Failed to update launch at login: \(error)")
-        }
+        LaunchAtLoginService.setEnabled(enabled)
+        launchAtLoginNeedsApproval = LaunchAtLoginService.requiresApproval
         #endif
     }
 }
