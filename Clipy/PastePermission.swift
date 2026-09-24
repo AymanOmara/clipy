@@ -25,4 +25,23 @@ enum PastePermission {
         guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") else { return }
         NSWorkspace.shared.open(url)
     }
+    
+    /// Explains why the permission is needed, then hands off to the system prompt and Settings.
+    /// Called on every launch while access is missing, so a fresh install always asks.
+    static func promptIfNeeded() {
+        guard !isGranted else { return }
+        
+        NSApp.activate()
+        let alert = NSAlert()
+        alert.messageText = "Allow Clipy to Paste for You"
+        alert.informativeText = "Clipy needs Accessibility access to paste the item you pick straight into the app you were using.\n\nTurn on Clipy in System Settings › Privacy & Security › Accessibility. Without it, items are still copied and you can press ⌘V yourself."
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Grant Access")
+        alert.addButton(withTitle: "Not Now")
+        
+        if alert.runModal() == .alertFirstButtonReturn {
+            request()
+            openAccessibilitySettings()
+        }
+    }
 }
