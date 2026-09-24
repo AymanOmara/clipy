@@ -191,10 +191,18 @@ final class PanelManager: NSObject {
         guard let historyManager = historyManager, let panel = panelWindow else { return }
         historyManager.copyToClipboard(item)
         let targetApp = previouslyActiveApp
-        
+        let canPaste = PastePermission.isGranted
+
         animator.slideDown(panel: panel) { [weak self] in
             guard let self = self else { return }
             self.panelWindow?.orderOut(nil)
+            guard canPaste else {
+                // Item stays on the clipboard for a manual ⌘V; point the user at the missing permission.
+                targetApp?.activate()
+                PastePermission.request()
+                PastePermission.openAccessibilitySettings()
+                return
+            }
             if let app = targetApp {
                 app.activate()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {

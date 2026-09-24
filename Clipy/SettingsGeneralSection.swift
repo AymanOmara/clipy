@@ -11,6 +11,7 @@ struct SettingsGeneralSection: View {
     @Bindable var manager: ClipboardHistoryManager
     @State private var launchAtLoginEnabled = false
     @State private var launchAtLoginNeedsApproval = false
+    @State private var pastePermissionGranted = PastePermission.isGranted
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -50,6 +51,26 @@ struct SettingsGeneralSection: View {
                 }
                 
                 Divider()
+                
+                HStack {
+                    Label("Auto-Paste", systemImage: "keyboard")
+                        .foregroundColor(.primary)
+                    Spacer()
+                    if pastePermissionGranted {
+                        Label("Enabled", systemImage: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                    } else {
+                        Button("Grant Access") {
+                            PastePermission.request()
+                            PastePermission.openAccessibilitySettings()
+                        }
+                        .controlSize(.small)
+                    }
+                }
+                .padding()
+                
+                Divider()
                 #endif
                 
                 HStack {
@@ -77,6 +98,9 @@ struct SettingsGeneralSection: View {
         }
         .onAppear {
             checkLaunchAtLoginStatus()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            pastePermissionGranted = PastePermission.isGranted
         }
     }
     
