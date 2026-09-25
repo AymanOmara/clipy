@@ -9,111 +9,79 @@ import SwiftUI
 
 struct SettingsStorageSection: View {
     let manager: ClipboardHistoryManager
-    
+    @State private var cacheBytes: Int64 = 0
+    @State private var cleanupMessage: String?
+    @State private var pendingClear: ClearScope?
+
+    private enum ClearScope: Identifiable {
+        case unpinned, all
+        var id: Self { self }
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Data & Actions")
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundColor(.secondary)
-                .textCase(.uppercase)
-            
-            VStack(spacing: 12) {
-                HStack {
-                    Text("Total Items in History")
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Text("\(manager.items.count)")
-                        .fontWeight(.bold)
-                        .foregroundColor(.secondary)
+        Form {
+            Section("History") {
+                LabeledContent("Items", value: "\(manager.items.count)")
+                LabeledContent("Pinned or in a pinboard", value: "\(manager.items.filter(\.isProtected).count)")
+            }
+
+            Section {
+                LabeledContent("Image cache", value: ByteCountFormatter.string(fromByteCount: cacheBytes, countStyle: .file))
+                LabeledContent {
+                    Button("Remove Unused Images") { removeUnusedImages() }
+                } label: {
+                    Text("Unused images")
+                    if let cleanupMessage { Text(cleanupMessage) }
                 }
-                
-                HStack {
-                    Text("Pinned Items")
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Text("\(manager.items.filter { $0.isPinned }.count)")
-                        .fontWeight(.bold)
-                        .foregroundColor(.secondary)
+            } footer: {
+                Text("Images are kept only while they're in your history.")
+                    .settingsFooter()
+            }
+
+            Section {
+                LabeledContent {
+                    Button("Clear…", role: .destructive) { pendingClear = .unpinned }
+                        .foregroundStyle(.red)
+                } label: {
+                    Text("Clear history")
+                    Text("Keeps pinned and pinboard items.")
                 }
-                
-                Divider().padding(.vertical, 4)
-                
-                HStack(spacing: 12) {
-                    Button(action: {
-                        manager.clearHistory(includePinned: false)
-                    }) {
-                        Text("Clear Unpinned")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .background(Color.orange.opacity(0.1))
-                            .foregroundColor(.orange)
-                            .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: {
-                        manager.clearHistory(includePinned: true)
-                    }) {
-                        Text("Clear All")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .background(Color.red.opacity(0.1))
-                            .foregroundColor(.red)
-                            .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-                }
-                
-                Divider().padding(.vertical, 4)
-                
-                HStack(spacing: 12) {
-                    Button(action: {
-                        AppLifecycleUtility.restartApp()
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "arrow.clockwise")
-                            Text("Restart App")
-                        }
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.accentColor.opacity(0.12))
-                        .foregroundColor(.accentColor)
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: {
-                        NSApp.terminate(nil)
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "power")
-                            Text("Quit Clipy")
-                        }
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.primary.opacity(0.06))
-                        .foregroundColor(.secondary)
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
+                LabeledContent {
+                    Button("Clear All…", role: .destructive) { pendingClear = .all }
+                        .foregroundStyle(.red)
+                } label: {
+                    Text("Clear everything")
+                    Text("Also removes pinned and pinboard items.")
                 }
             }
-            .padding()
-            .background(Color(NSColor.windowBackgroundColor).opacity(0.5))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-            )
         }
+        .onAppear { refreshCacheSize() }
+        .onChange(of: manager.items.count) { refreshCacheSize() }
+        .confirmationDialog(
+            pendingClear == .all ? "Clear all history, including pinned items?" : "Clear history?",
+            isPresented: Binding(get: { pendingClear != nil }, set: { if !$0 { pendingClear = nil } }),
+            presenting: pendingClear
+        ) { scope in
+            Button(scope == .all ? "Clear All" : "Clear History", role: .destructive) {
+                manager.clearHistory(includePinned: scope == .all)
+            }
+        } message: { scope in
+            Text(scope == .all
+                 ? "Every item, including pinned and pinboard items, will be deleted. This can't be undone."
+                 : "Items that aren't pinned or in a pinboard will be deleted. This can't be undone.")
+        }
+    }
+
+    private func refreshCacheSize() {
+        cacheBytes = manager.storage.cacheSizeInBytes()
+    }
+
+    private func removeUnusedImages() {
+        let referenced = Set(manager.items.compactMap(\.imagePath))
+        let freed = manager.storage.removeOrphanedImages(referenced: referenced)
+        refreshCacheSize()
+        cleanupMessage = freed > 0
+            ? "Freed \(ByteCountFormatter.string(fromByteCount: freed, countStyle: .file))."
+            : "Nothing to remove."
     }
 }

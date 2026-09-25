@@ -9,39 +9,40 @@ Clipy introduces a card-based horizontal slide-up panel inspired by the Paste ap
 ## ✨ Features
 
 - **🎴 Card-Based Horizontal Interface**:
-  - Displays rich visual preview cards for **Texts**, **Images**, and **Files**.
-  - Shows metadata including source application icons, character/line count, image dimensions, and relative timestamps.
-  - Hover action shortcuts to pin, copy, or delete items.
-  - Dedicated **`✕` close button** with smooth red hover highlight.
+  - Rich preview cards for **Texts**, **Images**, and **Files**, with the real source-app icon, character/line count, image dimensions, and relative timestamps.
+  - **Smart content detection**: links (domain + URL), colors (live swatch for `#hex` / `rgb()`), emails, phone numbers, and code (syntax highlighted).
+  - Hover actions to add to the paste stack, pin, or delete; right-click for every action.
 
 - **🚀 Multiple Activation Methods**:
-  - **Global Hotkey**: Press `⌘ + Shift + V` from anywhere.
-  - **Trackpad Swipe Up**: Swipe up with two fingers near the bottom edge of the screen.
-  - **Floating Home Bar Indicator**: Subtle, translucent pill indicator at the bottom center of the screen.
-  - **Menu Bar Status Item**: Left-click to toggle, right-click for context menu (Toggle, Restart, Quit).
+  - **Global Hotkey**: `⌘ + Shift + V` by default — **customisable** in Settings › Shortcuts.
+  - **Trackpad Swipe Up**, **Floating Home Bar Indicator**, and **Menu Bar Status Item**.
 
-- **⚡ Instant Auto-Pasting & Keyboard Shortcuts**:
-  - Press `1` through `9` for instant 1-click paste of recent cards.
-  - Navigate effortlessly using `←` / `→` arrow keys and `Enter`.
-  - Automatically activates the target application and synthesizes `⌘ + V`.
+- **⚡ Pasting**:
+  - `1`–`9` quick paste, `←` / `→` + `Enter` to navigate and paste, automatic `⌘V` into the previous app.
+  - **Rich text is preserved** (RTF/HTML); **Paste as Plain Text** with `⌥ + Enter` or `⌥`-click.
+  - **Paste Transformed**: UPPERCASE, lowercase, Title Case, trim / collapse whitespace, format / minify JSON, URL encode / decode, Base64 encode / decode.
+  - **Paste Stack**: queue items with `⇧ + Enter`, then press `⌃⌘V` (customisable) in any app to paste them one by one — ideal for forms.
 
-- **🔍 Search & Filter Categories**:
-  - Real-time search across text content, filenames, and source applications.
-  - Category tabs: **All**, **Texts**, **Images**, **Files**, and **Pinned**.
+- **📌 Organise**:
+  - **Pinboards**: named, coloured collections (Work, Code, Replies…) shown as tabs; items in a pinboard are never trimmed.
+  - **Snippets**: reusable text templates with placeholders — `{date}`, `{time}`, `{datetime}`, `{weekday}`, `{clipboard}`, `{uuid}`.
+  - **Quick Look**: press `Space` on a card to preview the full text (with formatting), image (with recognised text), or file list.
 
-- **🔄 In-App Restart & Background Persistence**:
-  - `AppDelegate` lifecycle management keeps the accessory app alive persistently.
-  - 1-click **Restart App** button in Preferences and Menu Bar context menu.
-  - Clean single-close Preferences panel that dismisses without quitting the background service.
+- **🔍 Search & Filter**:
+  - Fuzzy search across text, file names, source apps, and **text recognised inside images (OCR)**.
+  - Filters: `app:safari`, `type:image|text|file|link|color|code|email|phone`, `is:pinned`, `is:rich`, `date:today|yesterday|week|month`, `board:work`.
+  - Tabs: **All**, **Texts**, **Images**, **Files**, **Links**, **Colors**, **Code**, **Pinned**, **Snippets**, plus one per pinboard.
 
 - **🔒 Privacy & Local Persistence**:
   - 100% offline and local storage. No network connections or analytics.
-  - History stored in `~/Library/Application Support/self.Clipy/`.
-  - Image assets cached in `~/Library/Caches/self.Clipy/`.
+  - Skips data marked as concealed/transient by password managers, and ignores **any app you choose** (Keychain Access, Passwords, 1Password, Bitwarden, and LastPass by default).
+  - **Retention by age** (1 / 7 / 30 / 90 days or forever) on top of the item limit; pinned and pinboard items are always kept.
+  - Image cache size shown in Settings, with one-click removal of unused images.
 
-- **📐 Clean Architecture & SOLID Design**:
-  - Fully decoupled services (`DiskClipboardStorage`, `ClipboardMonitor`, `HotkeyManager`, `PasteSimulator`).
-  - Modular SwiftUI views (all files strictly under 180 lines of clean code).
+- **🤖 Shortcuts & Siri (App Intents)**:
+  - *Get Latest Clipboard Item*, *Search Clipboard History*, *Save Text to Clipy* (optionally into a pinboard), *Get Snippet*, *Show Clipy*.
+
+- **🔄 Background Persistence**: accessory app with in-app restart, launch at login, and a Settings window that closes without quitting.
 
 ---
 
@@ -49,13 +50,17 @@ Clipy introduces a card-based horizontal slide-up panel inspired by the Paste ap
 
 | Action | Shortcut / Gesture |
 | :--- | :--- |
-| **Open Clipy** | `⌘ + Shift + V` or swipe up at bottom edge or click bottom pill |
-| **Close Clipy** | `Esc`, click top-right red `✕` button, or click outside the panel |
-| **Navigate Cards** | `←` Left Arrow / `→` Right Arrow |
-| **Paste Selected Card** | `Enter` / `Return` or click card |
-| **Quick Paste Items 1–9** | `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9` |
-| **Open Preferences** | Click `⚙` Settings icon |
-| **Restart Clipy** | Click **Restart App** in Preferences or Right-click Menu Bar icon |
+| **Open Clipy** | `⌘ + Shift + V` (customisable), swipe up at bottom edge, or click bottom pill |
+| **Close Clipy / Preview** | `Esc`, click the red `✕` button, or click outside the panel |
+| **Navigate Cards** | `←` / `→` |
+| **Paste Selected Card** | `Enter` or click |
+| **Paste as Plain Text** | `⌥ + Enter` or `⌥`-click |
+| **Add to / Remove from Paste Stack** | `⇧ + Enter` or the stack button on hover |
+| **Paste Next from Stack** | `⌃ + ⌘ + V` in any app (customisable) |
+| **Quick Look Preview** | `Space` |
+| **Quick Paste Items 1–9** | `1` … `9` |
+| **More Actions** | Right-click a card (transform, pinboard, snippet, open link, reveal in Finder) |
+| **Open Settings** | Click `⚙` |
 
 ---
 
@@ -77,7 +82,12 @@ xcodebuild -scheme Clipy -configuration Debug -destination 'platform=macOS' buil
 
 # Run the app
 open build/Build/Products/Debug/Clipy.app
+
+# Run the unit tests
+xcodebuild test -scheme Clipy -destination 'platform=macOS'
 ```
+
+Tests run hosted in the app, which detects the test run and uses an isolated history, pasteboard and preferences domain — your real history is never touched.
 
 ---
 
@@ -86,42 +96,38 @@ open build/Build/Products/Debug/Clipy.app
 ```
 Clipy/
 ├── App & Lifecycle/
-│   ├── ClipyApp.swift                      # SwiftUI App entry point
-│   ├── AppDelegate.swift                   # Accessory lifecycle & termination guard
+│   ├── ClipyApp.swift / AppDelegate.swift  # Entry point, accessory lifecycle, flush on quit
+│   ├── AppEnvironment.swift                # Isolated setup when hosting unit tests
 │   └── AppLifecycleUtility.swift           # In-app restart & relaunch helper
-├── Core & Models/
-│   ├── ClipboardHistoryItem.swift          # Data model and preview formatters
-│   └── FilterType.swift                    # Category filtering definitions
+├── Models/
+│   ├── ClipboardHistoryItem.swift          # History item (backward-compatible Codable)
+│   ├── ClipboardCapture.swift              # Raw pasteboard content before dedup
+│   ├── ContentClassifier.swift             # Link / color / email / phone / code detection
+│   ├── Pinboard.swift / Snippet.swift      # Collections and templates (+ placeholder expansion)
+│   ├── FilterType.swift / SearchQuery.swift# Tabs, fuzzy search and search filters
+│   ├── TextTransform.swift                 # Paste Transformed conversions
+│   └── KeyCombo.swift                      # Global shortcut model
 ├── Services/
-│   ├── Storage/
-│   │   ├── ClipboardStorageProtocol.swift   # Storage interface (DIP)
-│   │   └── DiskClipboardStorage.swift       # JSON & cached asset persistence
-│   ├── Monitoring/
-│   │   ├── ClipboardMonitoringProtocol.swift# Pasteboard monitor interface
-│   │   └── ClipboardMonitor.swift          # System pasteboard observer
-│   ├── Hotkey/
-│   │   ├── HotkeyManager.swift              # Carbon global hotkey manager
-│   │   └── HotkeyManagingProtocol.swift     # Hotkey interface abstraction
-│   └── Automation/
-│       ├── PasteSimulator.swift             # CGEvent synthetic keystroke injector
-│       └── PasteSimulatingProtocol.swift    # Keystroke simulation interface
-├── State & Coordination/
-│   ├── ClipboardHistoryManager.swift        # Domain state, deduplication & trimming
-│   ├── ClipboardHistoryManager+Actions.swift# Pasteboard actions & pin management
-│   ├── PanelManager.swift                   # Coordinator managing windows & lifecycle
-│   ├── PanelPresentationAnimator.swift      # Spring slide animations
-│   ├── GlobalEventMonitorManager.swift      # System-wide mouse & keyboard monitor
-│   ├── MenuBarController.swift              # Status item & right-click menu
-│   └── SettingsWindowController.swift       # Preferences NSPanel controller
+│   ├── DiskClipboardStorage.swift          # Debounced background JSON writes, image cache
+│   ├── ClipboardMonitor.swift              # Pasteboard observer (rich text, multi-file, exclusions)
+│   ├── ExcludedAppsStore.swift             # Ignored apps
+│   ├── ImageProcessor.swift                # Off-main hashing, PNG encoding, Vision OCR
+│   ├── HotkeyManager.swift / HotkeySettings.swift # Multiple Carbon hotkeys, user shortcuts
+│   ├── PasteSimulator.swift / PastePermission.swift
+│   └── ClipyAppIntents.swift               # Shortcuts actions
+├── Coordination/
+│   ├── ClipboardHistoryManager(+Actions).swift # State, dedup, trimming, retention, pinboards, snippets
+│   ├── PanelManager(+Paste).swift          # Windows, hotkeys, paste requests, paste stack
+│   ├── PasteStack.swift                    # Queue for Paste Next
+│   ├── PreviewWindowController.swift       # Quick Look window
+│   └── GlobalEventMonitorManager.swift / MenuBarController.swift / SettingsWindowController.swift
 └── UI Views/
-    ├── HorizontalContentView.swift          # Main horizontal card panel
-    ├── HorizontalHeaderBar.swift            # Search bar, filter pills & red close button
-    ├── ClipboardCardView.swift              # History item preview card
-    ├── CardBodyView.swift                   # Dynamic body (Text/Image/File)
-    ├── PillHandleView.swift                 # Bottom Home Bar capsule handle
-    ├── EmptyClipboardView.swift             # Placeholder empty state
-    ├── VisualEffectView.swift               # NSVisualEffectView glassmorphism wrapper
-    └── Settings/                            # Preferences (General, Gestures, Storage)
+    ├── HorizontalContentView.swift / PanelKeyboardHandler.swift
+    ├── HorizontalHeaderBar.swift / FilterPill.swift
+    ├── ClipboardCardView.swift / CardBodyView.swift / CardChrome.swift / CardContextMenu.swift
+    ├── SnippetCardView.swift / PreviewView.swift / SyntaxHighlighter.swift
+    └── Settings*.swift                     # System Settings–style sidebar: General, Shortcuts, Gestures, Privacy, Snippets, Pinboards, Storage, About
+ClipyTests/                                 # Swift Testing unit tests
 ```
 
 ---

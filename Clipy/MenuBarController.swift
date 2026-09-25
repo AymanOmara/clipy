@@ -51,8 +51,9 @@ final class MenuBarController: NSObject, MenuBarControlling {
         guard let button = statusItem?.button else { return }
         let menu = NSMenu()
         
-        let toggleItem = NSMenuItem(title: "Toggle Clipy", action: #selector(menuToggleAction), keyEquivalent: "V")
-        toggleItem.keyEquivalentModifierMask = [.command, .shift]
+        let combo = HotkeySettings.shared.toggleCombo
+        let toggleItem = NSMenuItem(title: "Toggle Clipy", action: #selector(menuToggleAction), keyEquivalent: combo.keyName.count == 1 ? combo.keyName.lowercased() : "")
+        toggleItem.keyEquivalentModifierMask = combo.eventModifierFlags
         toggleItem.target = self
         menu.addItem(toggleItem)
         

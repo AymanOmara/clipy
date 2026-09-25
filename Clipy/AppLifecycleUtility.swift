@@ -16,6 +16,8 @@ enum AppLifecycleUtility {
         process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
         process.arguments = ["-n", bundleURL.path]
         
+        // The new instance loads history on launch, so the pending debounced save must land first.
+        ClipboardHistoryManager.shared?.storage.flush()
         do {
             try process.run()
             NSApp.terminate(nil)

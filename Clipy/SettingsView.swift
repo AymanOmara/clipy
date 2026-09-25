@@ -7,53 +7,53 @@
 
 import SwiftUI
 
+/// Settings window laid out like macOS System Settings: a sidebar of panes and a grouped form.
 struct SettingsView: View {
     @Environment(ClipboardHistoryManager.self) var manager
-    @Binding var isPresented: Bool
-    
+    @AppStorage("clipy_settings_pane") private var selection: SettingsPane = .general
+
     var body: some View {
-        @Bindable var manager = manager
-        VStack(spacing: 0) {
-            headerBar
-            
-            Divider()
-            
-            ScrollView {
-                VStack(spacing: 20) {
-                    SettingsGeneralSection(manager: manager)
-                    SettingsGesturesSection()
-                    SettingsStorageSection(manager: manager)
-                    footerBranding
+        NavigationSplitView {
+            List(selection: Binding(get: { selection }, set: { if let pane = $0 { selection = pane } })) {
+                ForEach(SettingsPane.allCases) { pane in
+                    Label {
+                        Text(pane.title)
+                    } icon: {
+                        SettingsPaneIcon(pane: pane)
+                    }
+                    .tag(pane)
+                    .padding(.vertical, 1)
+
+                    if pane.endsGroup {
+                        Spacer().frame(height: 6)
+                            .listRowSeparator(.hidden)
+                            .selectionDisabled()
+                    }
                 }
-                .padding()
             }
+            .listStyle(.sidebar)
+            .navigationSplitViewColumnWidth(min: 190, ideal: 200, max: 240)
+            .toolbar(removing: .sidebarToggle)
+        } detail: {
+            pane(selection)
+                .formStyle(.grouped)
+                .navigationTitle(selection.title)
+                .frame(minWidth: 460)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(NSColor.windowBackgroundColor).opacity(0.95))
+        .frame(minWidth: 680, minHeight: 480)
     }
-    
-    private var headerBar: some View {
-        HStack {
-            Text("Preferences")
-                .font(.headline)
-                .foregroundColor(.primary)
-            Spacer()
+
+    @ViewBuilder
+    private func pane(_ pane: SettingsPane) -> some View {
+        switch pane {
+        case .general: SettingsGeneralSection(manager: manager)
+        case .shortcuts: SettingsShortcutsSection()
+        case .gestures: SettingsGesturesSection()
+        case .privacy: SettingsPrivacySection()
+        case .snippets: SettingsSnippetsSection(manager: manager)
+        case .pinboards: SettingsPinboardsSection(manager: manager)
+        case .storage: SettingsStorageSection(manager: manager)
+        case .about: SettingsAboutSection()
         }
-        .padding(.horizontal)
-        .padding(.vertical, 12)
-        .background(Color.primary.opacity(0.03))
-    }
-    
-    private var footerBranding: some View {
-        VStack(spacing: 4) {
-            Text("Clipy Clipboard Manager")
-                .font(.footnote)
-                .fontWeight(.semibold)
-                .foregroundColor(.secondary)
-            Text("Version 1.0.0 (Build 1)")
-                .font(.caption2)
-                .foregroundColor(Color(NSColor.tertiaryLabelColor))
-        }
-        .padding(.top, 10)
     }
 }

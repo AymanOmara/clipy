@@ -45,7 +45,8 @@ final class GlobalEventMonitorManager {
         }
         
         escapeMonitorLocal = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            if event.keyCode == 53 {
+            // Only consume Esc for the panel, so it still works in Preferences and alerts.
+            if event.keyCode == 53 && isPanelDisplayed() && NSApp.modalWindow == nil {
                 onEscape()
                 return nil
             }

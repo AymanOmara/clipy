@@ -12,8 +12,14 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        guard !AppEnvironment.isRunningTests else { return }
         LaunchAtLoginService.enableOnFirstLaunch()
         PastePermission.promptIfNeeded()
+    }
+    
+    func applicationWillTerminate(_ notification: Notification) {
+        // History saves are debounced onto a background queue; write the last one before exiting.
+        ClipboardHistoryManager.shared?.storage.flush()
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

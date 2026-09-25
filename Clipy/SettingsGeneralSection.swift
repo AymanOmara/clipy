@@ -12,109 +12,89 @@ struct SettingsGeneralSection: View {
     @State private var launchAtLoginEnabled = false
     @State private var launchAtLoginNeedsApproval = false
     @State private var pastePermissionGranted = PastePermission.isGranted
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("General")
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundColor(.secondary)
-                .textCase(.uppercase)
-            
-            VStack(spacing: 0) {
-                #if os(macOS)
-                HStack {
-                    Label("Launch at Login", systemImage: "macwindow.and.key")
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Toggle("", isOn: $launchAtLoginEnabled)
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                        .onChange(of: launchAtLoginEnabled) { _, newValue in
-                            toggleLaunchAtLogin(enabled: newValue)
-                        }
-                }
-                .padding()
-                
+        Form {
+            Section {
+                Toggle("Launch at login", isOn: $launchAtLoginEnabled)
+                    .onChange(of: launchAtLoginEnabled) { _, newValue in
+                        toggleLaunchAtLogin(enabled: newValue)
+                    }
                 if launchAtLoginNeedsApproval {
-                    HStack {
-                        Label("Allow Clipy in Login Items to start it automatically", systemImage: "exclamationmark.triangle.fill")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                        Spacer()
-                        Button("Open Settings") {
+                    LabeledContent {
+                        Button("Open Login Items…") {
                             LaunchAtLoginService.openLoginItemsSettings()
                         }
-                        .controlSize(.small)
+                    } label: {
+                        Label("Allow Clipy in Login Items to start automatically", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
                     }
-                    .padding([.horizontal, .bottom])
                 }
-                
-                Divider()
-                
-                HStack {
-                    Label("Auto-Paste", systemImage: "keyboard")
-                        .foregroundColor(.primary)
-                    Spacer()
+            }
+
+            Section {
+                LabeledContent("Paste into the previous app") {
                     if pastePermissionGranted {
-                        Label("Enabled", systemImage: "checkmark.circle.fill")
-                            .font(.caption)
-                            .foregroundColor(.green)
+                        Label("Allowed", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
                     } else {
-                        Button("Grant Access") {
+                        Button("Grant Access…") {
                             PastePermission.request()
                             PastePermission.openAccessibilitySettings()
                         }
-                        .controlSize(.small)
                     }
                 }
-                .padding()
-                
-                Divider()
-                #endif
-                
-                HStack {
-                    Label("History Limit", systemImage: "clock.arrow.circlepath")
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Picker("", selection: $manager.maxLimit) {
-                        Text("25 items").tag(25)
-                        Text("50 items").tag(50)
-                        Text("100 items").tag(100)
-                        Text("200 items").tag(200)
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 110)
-                }
-                .padding()
+            } footer: {
+                Text("Clipy uses Accessibility access to press ⌘V for you. Without it, the item is still copied and you paste it yourself.")
+                    .settingsFooter()
             }
-            .background(Color(NSColor.windowBackgroundColor).opacity(0.5))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-            )
+
+            Section {
+                Picker("Keep up to", selection: $manager.maxLimit) {
+                    Text("25 items").tag(25)
+                    Text("50 items").tag(50)
+                    Text("100 items").tag(100)
+                    Text("200 items").tag(200)
+                }
+                Picker("Delete items older than", selection: $manager.retentionDays) {
+                    Text("Never").tag(0)
+                    Text("1 day").tag(1)
+                    Text("7 days").tag(7)
+                    Text("30 days").tag(30)
+                    Text("90 days").tag(90)
+                }
+            } header: {
+                Text("History")
+            } footer: {
+                Text("Pinned items and items in a pinboard are always kept.")
+                    .settingsFooter()
+            }
         }
         .onAppear {
             checkLaunchAtLoginStatus()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             pastePermissionGranted = PastePermission.isGranted
+            checkLaunchAtLoginStatus()
         }
     }
-    
+
     private func checkLaunchAtLoginStatus() {
-        #if os(macOS)
         launchAtLoginEnabled = LaunchAtLoginService.isEnabled || LaunchAtLoginService.requiresApproval
         launchAtLoginNeedsApproval = LaunchAtLoginService.requiresApproval
-        #endif
     }
-    
+
     private func toggleLaunchAtLogin(enabled: Bool) {
-        #if os(macOS)
         LaunchAtLoginService.setEnabled(enabled)
         launchAtLoginNeedsApproval = LaunchAtLoginService.requiresApproval
-        #endif
+    }
+}
+
+extension Text {
+    /// Explanatory text under a settings group, sized and coloured like System Settings.
+    func settingsFooter() -> some View {
+        self.font(.callout)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

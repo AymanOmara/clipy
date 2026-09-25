@@ -21,31 +21,24 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         }
         
         let settingsPanel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 420),
-            styleMask: [.titled, .closable, .fullSizeContentView, .nonactivatingPanel],
+            contentRect: NSRect(x: 0, y: 0, width: 720, height: 540),
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
-        settingsPanel.title = "Clipy Preferences"
-        settingsPanel.titlebarAppearsTransparent = true
-        settingsPanel.titleVisibility = .visible
+        settingsPanel.title = "Clipy Settings"
+        settingsPanel.toolbarStyle = .unified
         settingsPanel.isReleasedWhenClosed = false
         settingsPanel.hidesOnDeactivate = false
         settingsPanel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        settingsPanel.center()
         settingsPanel.delegate = self
         
-        let settingsView = SettingsView(isPresented: Binding(
-            get: { [weak self] in self?.window?.isVisible ?? true },
-            set: { [weak self] isPresented in
-                if !isPresented {
-                    self?.window?.orderOut(nil)
-                }
-            }
-        ))
-        .environment(historyManager)
-        
-        settingsPanel.contentView = NSHostingView(rootView: settingsView)
+        // A hosting controller lets the split view's sidebar and pane title use the window toolbar.
+        let hostingController = NSHostingController(rootView: SettingsView().environment(historyManager))
+        hostingController.sceneBridgingOptions = [.title, .toolbars]
+        settingsPanel.contentViewController = hostingController
+        settingsPanel.setContentSize(NSSize(width: 720, height: 540))
+        settingsPanel.center()
         self.window = settingsPanel
         
         settingsPanel.orderFrontRegardless()
