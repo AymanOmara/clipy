@@ -23,6 +23,7 @@ struct CardContextMenu: View {
             Button("Paste as Plain Text") { actions.paste(.item(item, plainText: true)) }
         }
         if let text = item.stringValue {
+            Button("Edit & Paste…") { actions.editAndPaste(text) }
             transformMenu(for: text)
         }
         if let ocrText = item.ocrText {

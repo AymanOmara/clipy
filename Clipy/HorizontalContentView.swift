@@ -14,6 +14,12 @@ struct PanelActions {
     var preview: (PanelEntry) -> Void
     var openSettings: () -> Void
     var close: () -> Void
+
+    /// Opens an editor on `text` and pastes the result; cancelling leaves everything as it was.
+    func editAndPaste(_ text: String) {
+        guard let edited = TextEditPrompt.run(title: "Edit Before Pasting", text: text) else { return }
+        paste(.text(edited))
+    }
 }
 
 /// Primary horizontal card container view displaying clipboard history, search, and category filters.
@@ -97,6 +103,7 @@ struct HorizontalContentView: View {
                 selectedIndex: $selectedIndex,
                 paste: paste,
                 preview: actions.preview,
+                edit: edit,
                 toggleStack: { if case let .item(item) = $0 { pasteStack.toggle(item) } }
             ))
             .onAppear {
@@ -138,6 +145,16 @@ struct HorizontalContentView: View {
         switch entry {
         case let .item(item): actions.paste(.item(item, plainText: plainText))
         case let .snippet(snippet): actions.paste(.text(manager.expandedText(for: snippet)))
+        }
+    }
+
+    private func edit(_ entry: PanelEntry) {
+        switch entry {
+        case let .item(item):
+            guard let text = item.stringValue else { NSSound.beep(); return }
+            actions.editAndPaste(text)
+        case let .snippet(snippet):
+            actions.editAndPaste(manager.expandedText(for: snippet))
         }
     }
 

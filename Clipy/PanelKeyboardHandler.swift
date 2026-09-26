@@ -8,12 +8,13 @@
 import SwiftUI
 
 /// Keyboard navigation for the card strip:
-/// ←/→ move · ↩ paste · ⌥↩ paste as plain text · ⇧↩ add to paste stack · Space preview · 1–9 quick paste.
+/// ←/→ move · ↩ paste · ⌥↩ paste as plain text · ⇧↩ add to paste stack · Space preview · ⌘E edit & paste · 1–9 quick paste.
 struct PanelKeyboardHandler: ViewModifier {
     let entries: [PanelEntry]
     @Binding var selectedIndex: Int
     let paste: (PanelEntry, Bool) -> Void
     let preview: (PanelEntry) -> Void
+    let edit: (PanelEntry) -> Void
     let toggleStack: (PanelEntry) -> Void
 
     private var selectedEntry: PanelEntry? {
@@ -42,6 +43,11 @@ struct PanelKeyboardHandler: ViewModifier {
             .onKeyPress(.space) {
                 guard let entry = selectedEntry else { return .ignored }
                 preview(entry)
+                return .handled
+            }
+            .onKeyPress("e", phases: .down) { press in
+                guard press.modifiers == .command, let entry = selectedEntry else { return .ignored }
+                edit(entry)
                 return .handled
             }
             .onKeyPress(phases: .down) { press in

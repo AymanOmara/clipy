@@ -62,6 +62,7 @@ struct SnippetCardView: View {
         }
         .contextMenu {
             Button("Paste") { actions.paste(.text(manager.expandedText(for: snippet))) }
+            Button("Edit & Paste…") { actions.editAndPaste(manager.expandedText(for: snippet)) }
             Button("Quick Look") { actions.preview(.snippet(snippet)) }
             Divider()
             Button("Delete Snippet", role: .destructive) { manager.deleteSnippet(snippet) }

@@ -18,7 +18,7 @@ Clipy introduces a card-based horizontal slide-up panel inspired by the Paste ap
   - **Trackpad Swipe Up**, **Floating Home Bar Indicator**, and **Menu Bar Status Item**.
 
 - **⚡ Pasting**:
-  - `1`–`9` quick paste, `←` / `→` + `Enter` to navigate and paste, automatic `⌘V` into the previous app.
+  - `1`–`9` quick paste, `←` / `→` + `Enter` to navigate and paste, `⌘E` to edit the text before pasting, automatic `⌘V` into the previous app.
   - **Rich text is preserved** (RTF/HTML); **Paste as Plain Text** with `⌥ + Enter` or `⌥`-click.
   - **Paste Transformed**: UPPERCASE, lowercase, Title Case, trim / collapse whitespace, format / minify JSON, URL encode / decode, Base64 encode / decode.
   - **Paste Stack**: queue items with `⇧ + Enter`, then press `⌃⌘V` (customisable) in any app to paste them one by one — ideal for forms.

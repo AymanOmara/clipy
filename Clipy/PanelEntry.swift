@@ -55,3 +55,36 @@ enum TextPrompt {
         return value.isEmpty ? nil : value
     }
 }
+
+/// Modal multi-line editor used to tweak text before it is pasted.
+/// Return inserts a newline; ⌘↩ confirms.
+enum TextEditPrompt {
+    static func run(title: String, text: String, confirmTitle: String = "Paste") -> String? {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = "Press ⌘↩ to paste."
+        let confirm = alert.addButton(withTitle: confirmTitle)
+        confirm.keyEquivalent = "\r"
+        confirm.keyEquivalentModifierMask = .command
+        alert.addButton(withTitle: "Cancel")
+
+        let scrollView = NSTextView.scrollableTextView()
+        scrollView.frame = NSRect(x: 0, y: 0, width: 440, height: 240)
+        scrollView.borderType = .bezelBorder
+        let textView = scrollView.documentView as! NSTextView
+        textView.string = text
+        textView.font = .systemFont(ofSize: NSFont.systemFontSize)
+        textView.isRichText = false
+        textView.allowsUndo = true
+        textView.isAutomaticQuoteSubstitutionEnabled = false
+        textView.isAutomaticDashSubstitutionEnabled = false
+        textView.isAutomaticTextReplacementEnabled = false
+        alert.accessoryView = scrollView
+        alert.window.level = .statusBar + 2
+        alert.window.initialFirstResponder = textView
+
+        NSApp.activate()
+        guard alert.runModal() == .alertFirstButtonReturn else { return nil }
+        return textView.string.isEmpty ? nil : textView.string
+    }
+}
