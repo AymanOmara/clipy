@@ -66,8 +66,8 @@ Clipy introduces a card-based horizontal slide-up panel inspired by the Paste ap
 
 ## 🛠️ Requirements & Building
 
-- **macOS**: 14.0 (Sonoma) or later
-- **Xcode**: 15.0+
+- **macOS**: 26.4 or later
+- **Xcode**: 26.4+ (for the macOS 26.4 SDK)
 - **Swift**: 5.9+
 
 ### Build & Run via Terminal
