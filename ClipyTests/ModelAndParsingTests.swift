@@ -170,3 +170,37 @@ struct PasteStackTests {
         #expect(stack.isEmpty)
     }
 }
+
+struct TextFileExporterTests {
+    @Test func namesFileFromFirstLine() {
+        #expect(TextFileExporter.fileName(for: "  Meeting notes for Monday\nsecond line") == "Meeting notes for Monday.txt")
+    }
+
+    @Test func stripsCharactersNotAllowedInFileNames() {
+        #expect(TextFileExporter.fileName(for: "a/b:c?d*\"e\"") == "a b c d e.txt")
+    }
+
+    @Test func shortensLongFirstLineAtWordBoundary() {
+        let name = TextFileExporter.fileName(for: String(repeating: "word ", count: 30))
+        #expect(name.count <= 54)
+        #expect(name.hasSuffix("word.txt"))
+    }
+
+    @Test func fallsBackToDatedNameWhenNothingUsable() {
+        #expect(TextFileExporter.fileName(for: "  \n///").hasPrefix("Clipy Text "))
+    }
+
+    @Test func writesUTF8ContentAndClearsOldExports() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ClipyTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let first = try TextFileExporter.export("first", to: directory)
+        let text = "مرحبا بالعالم 👋\nsecond line"
+        let url = try TextFileExporter.export(text, to: directory)
+
+        #expect(url.lastPathComponent == "مرحبا بالعالم 👋.txt")
+        #expect(try String(contentsOf: url, encoding: .utf8) == text)
+        #expect(!FileManager.default.fileExists(atPath: first.path))
+    }
+}

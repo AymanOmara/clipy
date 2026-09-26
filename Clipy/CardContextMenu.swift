@@ -46,6 +46,9 @@ struct CardContextMenu: View {
         Button(item.isPinned ? "Unpin" : "Pin") { manager.togglePin(for: item) }
         pinboardMenu
         if item.type == .text {
+            Button("Copy as .txt File") {
+                if !manager.copyAsTextFile(item) { NSSound.beep() }
+            }
             Button("Save as Snippet") { manager.saveAsSnippet(item) }
         }
 

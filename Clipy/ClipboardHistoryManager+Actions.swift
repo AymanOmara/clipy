@@ -48,6 +48,19 @@ extension ClipboardHistoryManager {
         return true
     }
 
+    /// Save a text item as a `.txt` file and put that file on the pasteboard, so ⌘V in a chat app attaches it.
+    /// The file isn't recorded as a new history item.
+    @discardableResult
+    func copyAsTextFile(_ item: ClipboardHistoryItem) -> Bool {
+        guard let text = item.stringValue, let url = try? TextFileExporter.export(text) else { return false }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.writeObjects([url as NSURL])
+        lastCopiedItem = item
+        lastWrittenChangeCount = pasteboard.changeCount
+        return true
+    }
+
     /// Write arbitrary text (transformed items, snippets, OCR results); it is recorded as a new item.
     func copyText(_ text: String) {
         let pasteboard = NSPasteboard.general
