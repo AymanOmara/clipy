@@ -14,15 +14,13 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     
     func showSettings(with historyManager: ClipboardHistoryManager) {
         if let existing = window {
-            existing.orderFrontRegardless()
-            existing.makeKey()
-            NSApp.activate()
+            bringToFront(existing)
             return
         }
         
         let settingsPanel = NSPanel(
             contentRect: NSRect(x: 0, y: 0, width: 720, height: 540),
-            styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
+            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
@@ -41,9 +39,14 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         settingsPanel.center()
         self.window = settingsPanel
         
-        settingsPanel.orderFrontRegardless()
-        settingsPanel.makeKey()
-        NSApp.activate()
+        bringToFront(settingsPanel)
+    }
+    
+    /// Activates Clipy first so the window lands above the app the user was in, not behind it.
+    private func bringToFront(_ window: NSWindow) {
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
     }
     
     func windowShouldClose(_ sender: NSWindow) -> Bool {

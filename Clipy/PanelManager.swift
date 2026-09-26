@@ -206,6 +206,8 @@ final class PanelManager: NSObject {
     }
 
     private func openSettings() {
+        // Settings takes focus, so the panel must not hand it back to the previous app once it slides away.
+        previouslyActiveApp = nil
         hidePanel()
         guard let historyManager = self.historyManager else { return }
         settingsController.showSettings(with: historyManager)
